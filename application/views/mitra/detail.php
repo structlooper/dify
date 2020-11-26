@@ -15,6 +15,7 @@
                         <div class="card-body avatar">
                             <div class="row">
                                 <h4 class="col-auto mr-auto card-title">Owners Info</h4>
+                              
                                 <a class="col-auto btn btn-danger text-white" href="<?= base_url(); ?>mitra">
                                     <i class="mdi mdi-keyboard-backspace text-white"></i>Back</a>
                             </div>
@@ -391,14 +392,42 @@
                                             <div class="form-group row">
                                                 <div class="col-lg-3">
                                                     <label class=mt-2 for="ftr">Category Service</label>
+                                         
+                                                       
+                                                    
                                                 </div>
                                                 <div class="col-lg-9">
-                                                    <select class="js-example-basic-single" style="width:100%" name="category_merchant">
-                                                        <?php foreach ($merchantk as $mck) { ?>
-                                                            <option value="<?= $mck['id_kategori_merchant'] ?>" <?php if ($mck['id_kategori_merchant'] == $mitra['category_merchant']) { ?>selected<?php } ?>><?= $mck['nama_kategori'] ?></option>
-                                                        <?php
-                                                        } ?>
+                                                    <select class="js-example-basic-single" style="width:100%" name="category_merchant[]" multiple>
+                                                        <?php foreach ($merchantk as $mck) { 
+                                                                $print = false;  
+                                                                foreach ($selected as $d) {  
+                                                                    if($d->id_kategori_merchant == $mck['id_kategori_merchant'] ) { 
+                                                                        $print = true; 
+                                                                    }
+                                                                }?>
+                                            <option id="<?php echo $mck['id_kategori_merchant'] ?>" <?if($print){?> selected <? } ?>value="<?php echo $mck['id_kategori_merchant'] ?>"><?php echo $mck['nama_kategori'] ?></option>   
+                                                           <? }?>
+                       
+
+                                                            
+                                                            
+                                                       
+                                                        
+                                                        
+                                
+                         
+                                                        
+                                                            <!--<option value="<?= $mck['id_kategori_merchant'] ?>" <?php if ($mck['id_kategori_merchant'] == $mitra['category_merchant']) { ?>selected<?php } ?>><?= $mck['nama_kategori'] ?></option>-->
+                                                            <!-- <option value="<?= $mck['id_kategori_merchant'] ?>" <?php if ($mck['id_kategori_merchant'] == $mitra['category_merchant']) { ?>selected<?php } ?>><?= $mck['nama_kategori'] ?></option>-->
+                                                        
                                                     </select>
+                                                    <!-----------SEND MERCH ORGIINAL ID TO CONTROLLER  ------------>
+                                                    
+                                                    
+                                                    <input type="hidden" value="<?php print_r($merchId); ?>" name="merchidOrignal">
+                                                    
+                                                    
+                                                   <!---------- END  ------------->
                                                 </div>
                                             </div>
 

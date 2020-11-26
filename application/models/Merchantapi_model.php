@@ -65,12 +65,35 @@ class Merchantapi_model extends CI_model
         return $this->db->get();
     }
 
-    public function onmerchant($data, $where)
+    public function onmerchant($data)
     {
-        $this->db->where($where);
-        $this->db->update('merchant', $data);
+        
+        $query = $this->db->query("SELECT * FROM `mitra` WHERE `id_mitra`='$data->mitraid'");
+
+$row = $query->result();
+    $this->db->set('status_merchant', $data->value);
+$this->db->where('id_merchant', $row[0]->id_merchant);
+$Validate=$this->db->update('merchant');
+
+
+$merchantIDD=$row[0]->id_merchant;
+
+$queryafterupdate = $this->db->query("SELECT * FROM `merchant` WHERE `id_merchant`='$merchantIDD'");
+
+$rowqueryafterupdate = $queryafterupdate->result(); 
+
+if($Validate==1)
+{
+    return $rowqueryafterupdate;
+}
+else
+{
+    return false;
+}
+
         return true;
     }
+
 
     public function edit_profile_token($data, $phone)
     {

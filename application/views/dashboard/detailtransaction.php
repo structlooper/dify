@@ -356,9 +356,9 @@
                                                     </td>
                                                 <?php } ?>
                                                 <td><?= $currency['app_currency'] ?>
-                                                    <?= number_format($transaksi['biaya']/100,2,".",".") ?></td>
+                                                    <?= $transaksi['biaya']/100; ?> </td>
                                                 <td><?= $currency['app_currency'] ?>
-                                                    <?= number_format($transaksi['harga']/100,2,".",".") ?></td>
+                                                      <?= $transaksi['harga']/100; ?></td>
                                             </tr>
 
                                         </tbody>
@@ -372,7 +372,7 @@
                             <div class="container-fluid mt-5 w-100">
                                 <p class="text-right mb-2">Sub - Total amount:
                                     <?= $currency['app_currency'] ?>
-                                    <?= number_format($transaksi['harga']/100,2,".",".") ?></p>
+                                    <?= $transaksi['harga']/100; ?></p>
                                 <p class="text-right mb-2">Discount
                                     <span class="text-danger">
                                         (<?php if ($transaksi['pakai_wallet'] == '1') {
@@ -382,7 +382,7 @@
                                             } ?>
                                         %)</span>
                                     :<?= $currency['app_currency'] ?>
-                                    <?= number_format($transaksi['kredit_promo']/100,2,".",".") ?></p>
+                                    <?=$transaksi['kredit_promo']/100 ?></p>
                                 <br>
                                 <p class="text-right mb-2 mt-4">Payment Method :
                                     <?php if ($transaksi['pakai_wallet'] == '0') { ?>
@@ -394,7 +394,7 @@
                                 </p>
                                 <h4 class="text-right mb-5">Total :
                                     <?= $currency['app_currency'] ?>
-                                    <?= number_format($transaksi['biaya_akhir']/100,2,".",".") ?></h4>
+                                    <?= $transaksi['biaya_akhir']/100 ?></h4>
                                 <hr>
                             </div>
                         <?php } ?>

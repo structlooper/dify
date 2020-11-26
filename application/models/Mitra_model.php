@@ -156,7 +156,96 @@ class Mitra_model extends CI_model
         $this->db->where('id_merchant', $idmerchant);
         $this->db->update('merchant', $data);
     }
+    public function onoffmerchant($id,$value)
+    {
+         
+        $this->db->where('id_mitra', $id);
+        $this->db->update('	status_mitra', $value);
+        
+    }
+    
+    public function updateCatmerchant($target,$metchID)
+    {
+        
+       
 
+          $this->db->where('merch_id', $metchID);
+        $this->db->delete('cat_mitra');
+      
+        foreach($target as $cat)
+        {
+           
+          echo "INSERT INTO `cat_mitra`(`merch_id`,`cat_id`) VALUES($metchID,$cat)"  ;
+         $this->db->query("INSERT INTO `cat_mitra`(`merch_id`,`cat_id`) VALUES($metchID,$cat)");
+   
+     
+        }
+        
+     
+        
+        
+    }
+    
+    
+    public function getmerchId($id)
+    {
+        
+    
+          $data_merch=$this->db->query("SELECT `id_merchant` FROM `mitra` WHERE id_mitra='$id'")->result();
+       return $data_merch;
+        
+    }
+    
+    public function getCatMerch($id)
+    {
+        
+    
+        $data=$this->db->query("SELECT `cat_id` FROM `cat_mitra` WHERE merch_id=$id")->result();
+        
+       $data_Category = array();
+        foreach($data as $a)
+        {
+        
+       $temp=$this->db->query("SELECT `nama_kategori`,`id_kategori_merchant` FROM `category_merchant` WHERE id_kategori_merchant=$a->cat_id")->result();
+       //print( "\n Data: ". );
+       array_push($data_Category,$temp);
+       
+      
+        }
+        echo json_encode($data_Category);
+      //  exit;
+ 
+    return $data_Category;
+    }
+    
+    
+    public function getCatMerch2($id)
+    {
+        
+    
+        $data=$this->db->query("SELECT `cat_id` FROM `cat_mitra` WHERE merch_id=$id")->result();
+        
+       $data_Category = array();
+        foreach($data as $a)
+        {
+        
+       $temp=$this->db->query("SELECT `nama_kategori`,`id_kategori_merchant` FROM `category_merchant` WHERE id_kategori_merchant=$a->cat_id")->row();
+
+       array_push($data_Category,$temp);
+       
+      
+        }
+
+ 
+    return $data_Category;
+    }
+    
+    
+    
+    
+    
+    
+    
     public function hapuskategoryitembyId($id)
     {
         $this->db->where('kategori_item', $id);

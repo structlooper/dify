@@ -23,15 +23,54 @@
                     <div class="form-group">
                         <label for="service_tipe">Service Type</label>
                         <select class="js-example-basic-single" name="home" style="width:100%">
-                            <option value="1" <?php if ($home == '1') { ?>selected<?php } ?>>Passenger Transportation</option>
+                            <!--<option value="1" <?php if ($home == '1') { ?>selected<?php } ?>>Passenger Transportation</option>-->
                             <option value="2" <?php if ($home == '2') { ?>selected<?php } ?>>Shipment</option>
-                            <option value="3" <?php if ($home == '3') { ?>selected<?php } ?>>Rental Service</option>
+                            <!--<option value="3" <?php if ($home == '3') { ?>selected<?php } ?>>Rental Service</option>-->
                             <option value="4" <?php if ($home == '4') { ?>selected<?php } ?>>Purchasing Service</option>
+                                <option value="5" <?php if ($home == '5') { ?>selected<?php } ?>>City Hub</option>
                         </select>
                     </div>
+                    
+                    
+                     <div class="form-group">
+                        <label for="basedistance">Base Distance</label>
+                        <input type="number"   class="form-control" id="basedistance" name="basedistance"  value="<?= $basedistance ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceChargeType">Service Charge Type</label>
+                        <select class="js-example-basic-single" name="serviceChargeType" style="width:100%" required>
+                            <?php if($serviceChargeType=='per')
+                            {?>
+                            
+                           <option value="per" selected>Percentage</option>
+                           <?php } else {
+                           ?>
+                            <option value="per">Percentage</option>
+                            <?php } ?>
+                             <?php if($serviceChargeType=='rupee')
+                            {?>
+                            
+                           <option value="rupee" selected>INR</option>
+                           <?php } else {
+                           ?>
+                            <option value="rupee">INR</option>
+                            <?php } ?>
+                          
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="servicecharge">Service Charge</label>
+                        <input type="number"  class="form-control" id="servicecharge" name="servicecharge"  value="<?= $servicecharge/100 ?>" required>  
+                      
+                    </div>
+                    
+                    
+                    
+                    
+                    
                     <div class="form-group">
                         <label for="newstitle">Price</label>
-                        <input type="text" pattern="^\d+(\.|\,)\d{2}$" data-type="currency" class="form-control" id="newstitle" name="biaya" value="<?= number_format($biaya / 100, 2, ".", ".") ?>" required>
+                        <input type="number" class="form-control" id="newstitle" name="biaya" value="<?= $biaya/100 ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="newstitle">Discount (%)</label>

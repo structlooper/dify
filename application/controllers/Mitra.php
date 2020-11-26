@@ -31,7 +31,16 @@ class Mitra extends CI_Controller
 
     public function detail($id)
     {
+          $data['merch_id'] = $this->mitra->getmerchId($id);
         $data['mitra'] = $this->mitra->getmitrabyid($id);
+       foreach($data['merch_id'] as $aaaa)
+       {
+           echo $aaaa->id_merchant;
+       }
+      $merchID=$aaaa->id_merchant;
+      
+       $data['merchId']=$merchID;
+        $data['selected'] = $this->mitra->getCatMerch2($merchID);
         $data['item'] = $this->mitra->getitembyid($data['mitra']['id_merchant']);
         $data['itemk'] = $this->mitra->getitemkbyid($data['mitra']['id_merchant']);
         $data['currency'] = $this->app->getappbyid();
@@ -39,6 +48,23 @@ class Mitra extends CI_Controller
         $data['wallet'] = $this->mitra->wallet($id);
         $data['jumlah'] = count($data['item']);
         $data['merchantk'] = $this->mitra->getmerchantk();
+        
+        // foreach($data['merchantk'] as $e){
+        //   $add=array("selected" => "true");
+        //     array_push($e,$add);
+            
+            
+        //     foreach($data['selected'] as $d){
+        //         if($e['id_kategori_merchant']==$d->id_kategori_merchant){
+                    
+        //         }
+        //     }
+        // }
+        
+        //echo json_encode($data['merchantk']);
+         
+       
+        
         $data['transaksi'] = $this->mitra->gettranshistory($data['mitra']['id_merchant']);
         $data['fitur'] = $this->mitra->get_fitur_merchant();
 
@@ -264,9 +290,14 @@ class Mitra extends CI_Controller
 
     public function ubahmerchant($id)
     {
-        $this->form_validation->set_rules('nama_merchant', 'nama_merchant', 'trim|prep_for_form');
+          $metchID=$this->input->post('merchidOrignal', TRUE);
+        
+        $target = $this->input->post('category_merchant');
+ $this->form_validation->set_rules('nama_merchant', 'nama_merchant', 'trim|prep_for_form');
         $this->form_validation->set_rules('alamat_merchant', 'alamat_merchant', 'trim|prep_for_form');
         $datafitur['fitur'] = $this->mitra->get_fitur_merchant();
+         $metchID=$this->input->post('id_merchant', TRUE);
+         $dataCat['Cat_Data'] =   $this->mitra->getCatMerch($metchID);
         if ($this->form_validation->run() == TRUE) {
 
 
@@ -294,7 +325,7 @@ class Mitra extends CI_Controller
                     'id_merchant'               => html_escape($this->input->post('id_merchant', TRUE)),
                     'id_fitur'                  => html_escape($this->input->post('id_fitur', TRUE)),
                     'nama_merchant'             => html_escape($this->input->post('nama_merchant', TRUE)),
-                    'category_merchant'         => html_escape($this->input->post('category_merchant', TRUE)),
+                   // 'category_merchant'         => html_escape($this->input->post('category_merchant', TRUE)),
                     'alamat_merchant'           => html_escape($this->input->post('alamat_merchant', TRUE)),
                     'latitude_merchant'         => html_escape($this->input->post('latitude_merchant', TRUE)),
                     'longitude_merchant'        => html_escape($this->input->post('longitude_merchant', TRUE)),
@@ -304,12 +335,15 @@ class Mitra extends CI_Controller
                 ];
 
 
+
                 if (demo == TRUE) {
                     $this->session->set_flashdata('demo', 'NOT ALLOWED FOR DEMO');
                     redirect('mitra/detail/' . $id);
                 } else {
-
+                        
                     $this->mitra->updatemerchant($data);
+                     $metchID=$this->input->post('id_merchant', TRUE);
+                    $this->mitra->updateCatmerchant($target,$metchID);
                     $this->session->set_flashdata('ubah', 'Merchant Has Been Changed');
                     redirect('mitra/detail/' . $id);
                 }
@@ -319,7 +353,7 @@ class Mitra extends CI_Controller
                     'id_merchant'               => html_escape($this->input->post('id_merchant', TRUE)),
                     'id_fitur'                  => html_escape($this->input->post('id_fitur', TRUE)),
                     'nama_merchant'             => html_escape($this->input->post('nama_merchant', TRUE)),
-                    'category_merchant'         => html_escape($this->input->post('category_merchant', TRUE)),
+                   // 'category_merchant'         => html_escape($this->input->post('category_merchant', TRUE)),
                     'alamat_merchant'           => html_escape($this->input->post('alamat_merchant', TRUE)),
                     'latitude_merchant'         => html_escape($this->input->post('latitude_merchant', TRUE)),
                     'longitude_merchant'        => html_escape($this->input->post('longitude_merchant', TRUE)),
@@ -335,7 +369,8 @@ class Mitra extends CI_Controller
                 } else {
 
                     $this->mitra->updatemerchant($data);
-
+                     $metchID=$this->input->post('id_merchant', TRUE);
+                    $this->mitra->updateCatmerchant($target,$metchID);
                     $this->session->set_flashdata('ubah', 'Merchant Has Been Changed');
                     redirect('mitra/detail/' . $id);
                 }

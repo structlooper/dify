@@ -34,7 +34,7 @@ class Services extends CI_Controller
 
         $this->form_validation->set_rules('fitur', 'fitur', 'trim|prep_for_form');
         $this->form_validation->set_rules('home', 'home', 'trim|prep_for_form');
-        $this->form_validation->set_rules('biaya', 'biaya', 'trim|prep_for_form');
+        //$this->form_validation->set_rules('biaya', 'biaya', 'trim|prep_for_form');
         $this->form_validation->set_rules('keterangan_biaya', 'keterangan_biaya', 'trim|prep_for_form');
         $this->form_validation->set_rules('komisi', 'komisi', 'trim|prep_for_form');
         $this->form_validation->set_rules('driver_job', 'driver_job', 'trim|prep_for_form');
@@ -75,8 +75,14 @@ class Services extends CI_Controller
             $biaya_minimum = html_escape($this->input->post('biaya_minimum', TRUE));
             $wallet_minimum = html_escape($this->input->post('wallet_minimum', TRUE));
 
-            $remove = array(".", ",");
-            $add = array("", "");
+            // $remove = array(".", ",");
+            // $add = array("", "");
+            $biaya=$this->input->post('biaya', TRUE);
+                     $servicecharge=$this->input->post('servicecharge', TRUE);
+       //  echo $biaya;
+         
+           // exit;
+            
 
             $data             = [
                 'icon'                          => $gambar,
@@ -84,7 +90,7 @@ class Services extends CI_Controller
                 'fitur'                         => html_escape($this->input->post('fitur', TRUE)),
                 'home'                         => html_escape($this->input->post('home', TRUE)),
                 'urutan'                        => html_escape($this->input->post('urutan', TRUE)),
-                'biaya'                         => str_replace($remove, $add, $biaya),
+                'biaya'                         => $biaya*100,
                 'keterangan_biaya'              => html_escape($this->input->post('keterangan_biaya', TRUE)),
                 'komisi'                        => html_escape($this->input->post('komisi', TRUE)),
                 'driver_job'                    => html_escape($this->input->post('driver_job', TRUE)),
@@ -95,7 +101,10 @@ class Services extends CI_Controller
                 'keterangan'                    => html_escape($this->input->post('keterangan', TRUE)),
                 'nilai'                         => html_escape($this->input->post('nilai', TRUE)),
                 'keterangan'                    => html_escape($this->input->post('keterangan', TRUE)),
-                'active'                        => html_escape($this->input->post('active', TRUE))
+                'active'                        => html_escape($this->input->post('active', TRUE)),
+                'basedistance'                        => html_escape($this->input->post('basedistance', TRUE)),
+                'serviceChargeType'                        => html_escape($this->input->post('serviceChargeType', TRUE)),
+                'servicecharge'                        => $servicecharge*100
             ];
 
             if (demo == TRUE) {
@@ -120,7 +129,7 @@ class Services extends CI_Controller
     {
         $this->form_validation->set_rules('fitur', 'fitur', 'trim|prep_for_form');
         $this->form_validation->set_rules('home', 'home', 'trim|prep_for_form');
-        $this->form_validation->set_rules('biaya', 'biaya', 'trim|prep_for_form');
+       // $this->form_validation->set_rules('biaya', 'biaya', 'trim|prep_for_form');
         $this->form_validation->set_rules('keterangan_biaya', 'keterangan_biaya', 'trim|prep_for_form');
         $this->form_validation->set_rules('komisi', 'komisi', 'trim|prep_for_form');
         $this->form_validation->set_rules('driver_job', 'driver_job', 'trim|prep_for_form');
@@ -152,12 +161,14 @@ class Services extends CI_Controller
 
             $remove = array(".", ",");
             $add = array("", "");
+            
+            // print_r(html_escape($this->input->post('biaya', TRUE))*100);
+            // exit;
 
             $data             = [
-                'icon'                          => $gambar,
                 'fitur'                         => html_escape($this->input->post('fitur', TRUE)),
                 'home'                         => html_escape($this->input->post('home', TRUE)),
-                'biaya'                         => str_replace($remove, $add, $biaya),
+                'biaya'                         => html_escape($this->input->post('biaya', TRUE))*100,
                 'keterangan_biaya'              => html_escape($this->input->post('keterangan_biaya', TRUE)),
                 'komisi'                        => html_escape($this->input->post('komisi', TRUE)),
                 'driver_job'                    => html_escape($this->input->post('driver_job', TRUE)),
@@ -166,7 +177,10 @@ class Services extends CI_Controller
                 'maks_distance'                 => html_escape($this->input->post('maks_distance', TRUE)),
                 'wallet_minimum'                => str_replace($remove, $add, $wallet_minimum),
                 'keterangan'                    => html_escape($this->input->post('keterangan', TRUE)),
-                'active'                        => html_escape($this->input->post('active', TRUE))
+                'active'                        => html_escape($this->input->post('active', TRUE)),
+                'basedistance'                        => html_escape($this->input->post('basedistance', TRUE)),
+                'serviceChargeType'                        => html_escape($this->input->post('serviceChargeType', TRUE))*100,
+                'servicecharge'                        => html_escape($this->input->post('servicecharge', TRUE))
             ];
 
             $datanilai = [

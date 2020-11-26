@@ -51,7 +51,7 @@
                                         <td style="max-width:300px;"><?= $tr['alamat_asal'] ?></td>
                                         <td style="max-width:300px;"><?= $tr['alamat_tujuan'] ?></td>
                                         <td><?= $currency['app_currency'] ?>
-                                            <?= number_format($tr['biaya_akhir'] / 100, 2, ".", ".") ?></td>
+                                            <?= $tr['biaya_akhir']/100 ?></td>
                                         <td>
                                             <?php if ($tr['pakai_wallet'] == '0') {
                                                 echo 'CASH';

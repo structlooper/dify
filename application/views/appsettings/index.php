@@ -18,6 +18,7 @@
                     <div class="tab-minimal tab-minimal-success">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
+                                
                                 <a class="nav-link active" id="tab-2-1" data-toggle="tab" href="#app-2-1" role="tab" aria-controls="app-2-1" aria-selected="true">
                                     <i class="mdi mdi-cellphone-android"></i>App</a>
                             </li>
@@ -45,7 +46,12 @@
                                 <a class="nav-link" id="tab-2-7" data-toggle="tab" href="#banktransfer-2-7" role="tab" aria-controls="banktransfer-2-7" aria-selected="false">
                                     <i class="icon-credit-card menu-icon"></i>Bank Transfer</a>
                             </li>
-                            
+                             
+                            <li class="nav-item">
+                                <a class="nav-link" id="tab-2-8" data-toggle="tab" href="#dailypayout-2-8" role="tab" aria-controls="dailypayout-2-8" aria-selected="false">
+                                    <i class="icon-credit-card menu-icon"></i>Delivery Buddy Payout</a>
+                            </li>
+                             
                         </ul>
                         <div class="tab-content col-12 justify-content-center">
                             <div class="tab-pane fade show active" id="app-2-1" role="tabpanel" aria-labelledby="tab-2-1">
@@ -395,6 +401,79 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            
+                              <div class="tab-pane fade" id="dailypayout-2-8" role="tabpanel" aria-labelledby="tab-2-8">
+                                 <div class="col-12 grid-margin">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Delivery Buddy Payout</h4>
+                                            <br>
+                                            <?= form_open_multipart('appsettings/buddypayout'); ?>
+                                            <div class="form-group">
+                                                <label for="appemail">Per Delivery Commission</label>
+                                                 <input type="number" class="form-control" id="deliveryCommission" name="deliveryCommission" value="<?= $appsettings['deliveryCommission']/100; ?>" required>
+                                                <!--<input type="number" class="form-control" id="deliveryCommission5656" name="deliveryCommission4564" value="<?= $appsettings['deliveryCommission']/100; ?>" required></div>-->
+                                            <div class="form-group">
+                                                <label for="appname">Fuel Charges</label>
+                                                <input type="text" class="form-control" id="fuelCharges" name="fuelCharges" value="<?= $appsettings['fuelCharges']/100; ?>" required></div>
+                                            <div class="form-group">
+                                                <label for="appcontact">Daily Payout Hr's</label>
+                                                <input type="number" class="form-control" id="dailyPayoutHr" name="dailyPayoutHr" value="<?= $appsettings['dailyPayoutHr']; ?>" required>
+                                                </div>
+                                            <div class="form-group">
+                                                <label for="appwebsite">Daily Payout above hr's login</label>
+                                                <input type="text" class="form-control" id="dailyPayoutHrLogin" name="dailyPayoutHrLogin" value="<?= $appsettings['dailyPayoutHrLogin']/100; ?>" required></div>
+                                            <div class="form-group">
+                                                <label for="privacypolicy">1 Star rating</label></label>
+                                                <textarea type="number" class="form-control" id="rating1" name="rating1" required><?= $appsettings['rating1']/100; ?></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="privacypolicy">2 Star rating</label></label>
+                                                <textarea type="number" class="form-control" id="rating2" name="rating2" required><?= $appsettings['rating2']/100; ?></textarea>
+                                            </div>
+                                           <div class="form-group">
+                                                <label for="privacypolicy">3 Star rating</label></label>
+                                                <textarea type="number" class="form-control" id="rating3" name="rating3" required><?= $appsettings['rating3']/100; ?></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="privacypolicy">4 Star rating</label></label>
+                                                <textarea type="number" class="form-control" id="rating4" name="rating4" required><?= $appsettings['rating4']/100; ?></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="privacypolicy">5 Star rating</label></label>
+                                                <textarea type="number" class="form-control" id="rating5" name="rating5" required><?= $appsettings['rating5']/100; ?></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-success mr-2">Submit</button>
+
+                                            <?= form_close(); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
 
                         </div>
                     </div>

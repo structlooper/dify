@@ -57,6 +57,9 @@ class Service_model extends CI_model
         $this->db->set('wallet_minimum', $data['wallet_minimum']);
         $this->db->set('keterangan', $data['keterangan']);
         $this->db->set('active', $data['active']);
+        $this->db->set('basedistance', $data['basedistance']);
+        $this->db->set('serviceChargeType', $data['serviceChargeType']);
+        $this->db->set('servicecharge', $data['servicecharge']);
 
         $this->db->where('id_fitur', $data['id_fitur']);
         $this->db->update('fitur');

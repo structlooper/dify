@@ -55,7 +55,7 @@
                     <div class="row">
 
                         <div class="form-group col-2">
-                            <input type="tel" id="txtPhone" class="form-control" name="countrycode" <?php if ($_POST != NULL) { ?> value="<?= $_POST['countrycode']; ?>" <?php } ?> required>
+                            <input type="tel" id="txtPhone" class="form-control" name="countrycode" <?php if ($_POST != NULL) { ?> value="<?= $_POST['countrycode']; ?>" <?php } else {  ?> value="+91"  <?php } ?>required>
                         </div>
                         <div class=" form-group col-10">
                             <input type="text" class="form-control" id="phone" name="phone" <?php if ($_POST != NULL) { ?> value="<?= $_POST['phone']; ?>" <?php } ?> placeholder="enter phone number" required>

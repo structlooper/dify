@@ -121,4 +121,24 @@ class Appsettings_model extends CI_model
         $this->db->where('id', '1');
         $this->db->update('payusettings', $data);
     }
+    public function buddypayoutUpdate($dataE)
+    {
+        // print_r($dataE['deliveryCommission']);
+        // exit;
+      
+       $this->db->set('deliveryCommission', $dataE['deliveryCommission']);
+        $this->db->set('fuelCharges', $dataE['fuelCharges']);
+        $this->db->set('dailyPayoutHr', $dataE['dailyPayoutHr']);
+        $this->db->set('dailyPayoutHrLogin', $dataE['dailyPayoutHrLogin']);
+        $this->db->set('rating1', $dataE['rating1']);
+         $this->db->set('rating2', $dataE['rating2']);
+          $this->db->set('rating3', $dataE['rating3']);
+           $this->db->set('rating4', $dataE['rating4']);
+            $this->db->set('rating5', $dataE['rating5']);
+
+        $this->db->where('id', '1');
+        $this->db->update('app_settings');   
+    }
+   
+    
 }

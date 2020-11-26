@@ -381,4 +381,24 @@ class Appsettings extends CI_Controller
             $this->load->view('includes/footer');
         }
     }
+    public function buddypayout()
+    {
+        
+          $dataE = [
+                'deliveryCommission' => html_escape($this->input->post('deliveryCommission', TRUE))*100,
+                'fuelCharges' => html_escape($this->input->post('fuelCharges', TRUE))*100,
+                'dailyPayoutHr' => html_escape($this->input->post('dailyPayoutHr', TRUE)),
+             'dailyPayoutHrLogin' => html_escape($this->input->post('dailyPayoutHrLogin', TRUE))*100,
+             'rating1' => html_escape($this->input->post('rating1', TRUE))*100,
+             'rating2' => html_escape($this->input->post('rating2', TRUE))*100,
+             'rating3' => html_escape($this->input->post('rating3', TRUE))*100,
+             'rating4' => html_escape($this->input->post('rating4', TRUE))*100,
+             'rating5' => html_escape($this->input->post('rating5', TRUE))*100,
+            ];
+       
+        
+        $this->app->buddypayoutUpdate($dataE);
+        redirect('appsettings/index');
+        
+    }
 }

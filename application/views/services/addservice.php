@@ -22,15 +22,33 @@
                     <div class="form-group">
                         <label for="newscategory">Service Type</label>
                         <select class="js-example-basic-single" name="home" style="width:100%">
-                            <option value="1" >Passenger Transportation</option>
+                            <!--<option value="1" >Passenger Transportation</option>-->
                             <option value="2" >Shipment</option>
-                            <option value="3" >Rental</option>
+                            <!--<option value="3" >Rental</option>-->
                             <option value="4" >Purchasing Service</option>
+                             <option value="5" >City Box</option>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="basedistance">Base Distance</label>
+                        <input type="number"   class="form-control" id="basedistance" name="basedistance"  required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceChargeType">Service Charge Type</label>
+                        <select class="js-example-basic-single" name="serviceChargeType" style="width:100%" required>
+                           <option value="per" >Percentage</option>
+                           <option value="rupee" >INR</option>
+                            
+                        </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="servicecharge">Service Charge</label>
+                        <input type="number" class="form-control" id="servicecharge" name="servicecharge"  required>  
+                      
+                    </div>
+                    <div class="form-group">
                         <label for="newstitle">Price</label>
-                        <input type="text" pattern="^\d+(\.|\,)\d{2}$" data-type="currency" class="form-control" id="newstitle" name="biaya"  required>
+                        <input type="number" class="form-control" id="newstitle" name="biaya"  required>
                     </div>
                     <div class="form-group">
                         <label for="newstitle">Discount (%)</label>
@@ -57,7 +75,7 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group">    
                         <label for="newstitle">Minimum Price</label>
                         <input type="text" pattern="^\d+(\.|\,)\d{2}$" data-type="currency" class="form-control" id="newstitle" name="biaya_minimum" required>
                     </div>

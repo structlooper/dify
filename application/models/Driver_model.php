@@ -298,13 +298,215 @@ class Driver_model extends CI_model
 
     function edit_config($data, $id)
     {
-        $this->db->where('id_driver', $id);
-        $edit = $this->db->update('config_driver', $data);
+        
+     if($data['status']==1)
+     {
+    
+        $data["start_time"]=date("h:i:s");
+        
+        $time=$data["start_time"];
+        
+        
+          $this->db->set('status', 1);
+        $this->db->set('start_time', $time);
+       $this->db->where('id_driver',$id);
+        return $this->db->update('config_driver', $data);
+
+    
+      //exit;
+       
         if ($this->db->affected_rows() > 0) {
             return true;
         } else {
             return false;
         }
+     }
+     else
+     {
+
+
+         $data["endtime"]=date("h:i:s");
+        
+        $time=$data["endtime"];
+        
+        
+          $this->db->set('status', 1);
+        $this->db->set('endtime', $time);
+       $this->db->where('id_driver',$id);
+         $this->db->update('config_driver', $data);
+        
+         $getallmoney=$this->db->query("select * from config_driver WHERE id_driver='$id'");
+            $resultgetallmoney=$getallmoney->result();
+        
+  
+         $time1 = $resultgetallmoney[0]->start_time;
+$time2 = $resultgetallmoney[0]->endtime;
+      //   echo $time1;
+         
+         $time3 = strtotime($time1);
+          $time4 = strtotime($time2);
+        // echo $time3;
+         
+       //  exit;
+         $difference = round(abs($time4 - $time3) / 3600,2);
+
+
+$timeinsec=$difference*60*60;
+
+        
+  $getallmoneyhr=$this->db->query("select * from app_settings");
+            $resultgetallmoneyhr=$getallmoneyhr->result();
+        
+  //  print_r($resultgetallmoneyhr[0]->dailyPayoutHr);
+    
+    
+//print_r($);
+    $totalworksec=($resultgetallmoneyhr[0]->dailyPayoutHr)*60*60;
+    $moneyinhr=$resultgetallmoneyhr[0]->dailyPayoutHrLogin;
+    
+    $moneyinasec=$moneyinhr/$totalworksec;
+    //print_r($moneyinasec);
+   $moneytoadd=$timeinsec*$moneyinasec;
+    
+   // print_r($moneytoadd);
+    
+   
+   
+     $getdrivername1=$this->db->query("select * from driver WHERE id='$id'");
+            $resultgetdrivername1=$getdrivername1->result();
+
+  $nameDriver= $resultgetdrivername1[0]->nama_driver;
+  
+   
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$id'");
+            $resultgetallmoney=$getallmoney->result();
+             $allmoney=$moneytoadd+$resultgetallmoney[0]->saldo;
+            // print_r($resultgetallmoney);
+            // exit;
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$aaaaaaaaaaaaaaaaaaaaa=$this->db->query($sql,array('$id','$allmoney'));
+        
+         if($difference<1)
+          {
+            $difference2='By Login Time ' .$difference*60 . 'Min';
+          }
+          else
+          {
+              $difference2='By Login Time ' .$difference . 'Hr';
+          }
+               $dataForwallet = [
+        'id_user'=>$id,
+        'jumlah'=>$moneytoadd,
+        'bank'=>$difference2,
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>"Commission",
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $id);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+          }
+          else
+          { 
+              
+              
+              
+               
+          if($difference<1)
+          {
+            $difference2='By Login Time ' .$difference*60 . 'Min';
+          }
+          else
+          {
+              $difference2='By Login Time ' .$difference . 'Hr';
+          }
+               $dataForwallet = [
+        'id_user'=>$id,
+        'jumlah'=>$moneytoadd,
+        'bank'=>$difference2,
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $id);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+         
+        
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+       
+        if ($this->db->affected_rows() > 0) {
+            return true;
+        } else {
+            return false;
+        } 
+     }
+        
+        
+        
     }
 
     public function accept_request($cond)
@@ -397,7 +599,7 @@ class Driver_model extends CI_model
 
     public function finish_request($cond, $condtr)
     {
-     
+   
         $this->db->where($condtr);
         $this->db->update('transaksi', array('waktu_selesai' => date('Y-m-d H:i:s')));
 
@@ -465,8 +667,87 @@ class Driver_model extends CI_model
                 $datD = array(
                     'status' => '1'
                 );
+                
+                
                 $this->db->where(array('id_driver' => $cond['id_driver']));
                 $this->db->update('config_driver', $datD);
+                
+                  $getcommissionmoney=$this->db->query("select deliveryCommission from app_settings");
+            $resultgetcommissionmoney=$getcommissionmoney->result();
+         
+               $getdrivername1=$this->db->query("select * from driver WHERE id='$id'");
+            $resultgetdrivername1=$getdrivername1->result();
+
+  $nameDriver= $resultgetdrivername1[0]->nama_driver;
+  
+  
+   $getallmoney=$this->db->query("select * from saldo WHERE id_user='$id'");
+            $resultgetallmoney=$getallmoney->result();
+            
+            
+            $moneytoadd=$resultgetcommissionmoney[0]->deliveryCommission;
+            
+             $allmoney=$moneytoadd+$resultgetallmoney[0]->saldo;
+           
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$aaaaaaaaaaaaaaaaaaaaa=$this->db->query($sql,array('$id','$moneytoadd'));
+        
+      
+               $dataForwallet = [
+        'id_user'=>$id,
+        'jumlah'=>$moneytoadd,
+        'bank'=>'Delivery Commission',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>"Commission",
+        'status'=>'1'
+        
+       ];
+             
+               $this->db->where('id_user', $id);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$moneytoadd));
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+      
+          }
+          else
+          { 
+              
+              
+              
+               
+       
+               $dataForwallet = [
+        'id_user'=>$id,
+        'jumlah'=>$moneytoadd,
+        'bank'=>'Delivery Commission',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $id);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+
+          }
+         
                 return array(
                     'status' => true,
                     'data' => $last_trans->result(),
@@ -577,7 +858,7 @@ class Driver_model extends CI_model
         } else {
           
             $hasil = $data['harga'] * ($persen / 100);
-          
+        //   return json_encode(['status' => $hasil]);exit;
             $data_ins = array(
                 'id_user' => $data['id_driver'],
                 'jumlah' => $hasil,

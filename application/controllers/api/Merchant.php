@@ -272,30 +272,28 @@ class Merchant extends REST_Controller
         }
         $data = file_get_contents("php://input");
         $decoded_data = json_decode($data);
+    //  print_r($decoded_data->mitraid);
+    //  exit;
+       
 
-        $update = [
-            'status_merchant' => $decoded_data->status
-        ];
-
-        $where = [
-            'id_merchant' => $decoded_data->idmerchant,
-            'token_merchant' => $decoded_data->token
-        ];
-
-        $success = $this->Merchantapi_model->onmerchant($update, $where);
-
+        $success = $this->Merchantapi_model->onmerchant($decoded_data);
+      
+foreach($success as $Merchantdata)
+{
+    
+}
         if ($success) {
             $message = [
                 'code' => '200',
                 'message' => 'success',
-                'data' => $decoded_data->status
+                'data' => $Merchantdata
             ];
             $this->response($message, 200);
         } else {
             $message = [
                 'code' => '201',
-                'message' => 'gagal',
-                'data' => $decoded_data->status
+                'message' => 'failed',
+                'data' => $decoded_data->value
             ];
             $this->response($message, 200);
         }
@@ -1187,5 +1185,32 @@ class Merchant extends REST_Controller
             'kategori' => $kategori,
         ];
         $this->response($message, 200);
+    }
+    function merchantonoff($id,$value)
+    {
+        
+         $this->load->model('mitra_model', 'mitra');
+         $status=$this->mitra->onoffmerchant($id,$value);
+          if($status)
+          {
+           $message = [
+            'code' => '200',
+            'message' => 'Done',
+            
+        ];
+          }
+          else
+          
+          {
+               $message = [
+            'code' => '201',
+            'message' => 'Failed',
+            
+        ];
+              
+              
+          }
+        $this->response($message, 200);
+        
     }
 }

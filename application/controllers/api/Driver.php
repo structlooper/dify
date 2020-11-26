@@ -316,6 +316,8 @@ class Driver extends REST_Controller
         $dec_data = json_decode($data);
 
         $is_turn = $dec_data->is_turn;
+       
+        
         $dataEdit = array();
         if ($is_turn) {
             $dataEdit = array(
@@ -336,6 +338,7 @@ class Driver extends REST_Controller
                 $this->response($message, 200);
             }
         } else {
+            
             $dataEdit = array(
                 'status' => 4
             );
@@ -467,8 +470,7 @@ class Driver extends REST_Controller
             'id_driver' => $dec_data->id,
             'id_transaksi' => $dec_data->id_transaksi
         );
-
-        $data_tr = array(
+   $data_tr = array(
             'id_driver' => $dec_data->id,
             'id' => $dec_data->id_transaksi
         );

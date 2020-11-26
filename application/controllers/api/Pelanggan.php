@@ -119,7 +119,7 @@ class Pelanggan extends REST_Controller
         );
 
         $condition = array(
-            'password' => sha1($decoded_data->password),
+            // 'password' => sha1($decoded_data->password),
             'no_telepon' => $decoded_data->no_telepon,
             //'token' => $decoded_data->token
         );
@@ -147,7 +147,7 @@ class Pelanggan extends REST_Controller
             } else {
                 $message = array(
                     'code' => '404',
-                    'message' => 'wrong phone or password',
+                    'message' => 'wrong phone',
                     'data' => []
                 );
                 $this->response($message, 200);
@@ -155,7 +155,7 @@ class Pelanggan extends REST_Controller
         }
     }
 
-    function register_user_post()
+     function register_user_post()
     {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             header("WWW-Authenticate: Basic realm=\"Private Area\"");
@@ -166,15 +166,15 @@ class Pelanggan extends REST_Controller
         $data = file_get_contents("php://input");
         $dec_data = json_decode($data);
 
-        $email = $dec_data->email;
+        // $email = $dec_data->email;
         $phone = $dec_data->no_telepon;
-        $check_exist = $this->Pelanggan_model->check_exist($email, $phone);
+        $check_exist = $this->Pelanggan_model->check_exist($email=null, $phone);
         $check_exist_phone = $this->Pelanggan_model->check_exist_phone($phone);
-        $check_exist_email = $this->Pelanggan_model->check_exist_email($email);
+        // $check_exist_email = $this->Pelanggan_model->check_exist_email($email);
         if ($check_exist) {
             $message = array(
                 'code' => '201',
-                'message' => 'email and phone number already exist',
+                'message' => 'phone number already exist',
                 'data' => []
             );
             $this->response($message, 201);
@@ -185,13 +185,13 @@ class Pelanggan extends REST_Controller
                 'data' => []
             );
             $this->response($message, 201);
-        } else if ($check_exist_email) {
-            $message = array(
-                'code' => '201',
-                'message' => 'email already exist',
-                'data' => []
-            );
-            $this->response($message, 201);
+        // } else if ($check_exist_email) {
+        //     $message = array(
+        //         'code' => '201',
+        //         'message' => 'email already exist',
+        //         'data' => []
+        //     );
+        //     $this->response($message, 201);
         } else {
             if ($dec_data->checked == "true") {
                 $message = array(
@@ -208,10 +208,10 @@ class Pelanggan extends REST_Controller
                 $data_signup = array(
                     'id' => 'P' . time(),
                     'fullnama' => $dec_data->fullnama,
-                    'email' => $dec_data->email,
+                    // 'email' => $dec_data->email,
                     'no_telepon' => $dec_data->no_telepon,
                     'phone' => $dec_data->phone,
-                    'password' => sha1($dec_data->password),
+                    // 'password' => sha1($dec_data->password),
                     'tgl_lahir' => $dec_data->tgl_lahir,
                     'countrycode' => $dec_data->countrycode,
                     'fotopelanggan' => $namafoto,
@@ -220,8 +220,9 @@ class Pelanggan extends REST_Controller
                 $signup = $this->Pelanggan_model->signup($data_signup);
                 if ($signup) {
                     $condition = array(
-                        'password' => sha1($dec_data->password),
-                        'email' => $dec_data->email
+                        'phone' => $dec_data->phone
+                        // 'password' => sha1($dec_data->password),
+                        // 'email' => $dec_data->email
                     );
                     $datauser1 = $this->Pelanggan_model->get_data_pelanggan($condition);
                     $message = array(
@@ -241,6 +242,7 @@ class Pelanggan extends REST_Controller
             }
         }
     }
+
 
     function kodepromo_post()
     {
@@ -295,6 +297,7 @@ class Pelanggan extends REST_Controller
         $data = file_get_contents("php://input");
         $dec_data = json_decode($data);
         $slider = $this->Pelanggan_model->sliderhome();
+        $slider2 = $this->Pelanggan_model->sliderhome2();
         $fitur = $this->Pelanggan_model->fiturhome();
         $allfitur = $this->Pelanggan_model->fiturhomeall();
         $rating = $this->Pelanggan_model->ratinghome();
@@ -316,7 +319,7 @@ class Pelanggan extends REST_Controller
         $cek_login = $this->Pelanggan_model->get_data_pelanggan($condition);
         $payu = $this->Pelanggan_model->payusettings()->result();
         foreach ($app_settings as $item) {
-            if ($cek_login->num_rows() > 0) {
+            // if ($cek_login->num_rows() > 0) {
                 $message = array(
                     'code' => '200',
                     'message' => 'success',
@@ -332,6 +335,7 @@ class Pelanggan extends REST_Controller
                     'paypal_active' => $item['paypal_active'],
                     'app_email' => $item['app_email'],
                     'slider' => $slider,
+                    'slider2'=>$slider2,
                     'fitur' => $fitur,
                     'allfitur' => $allfitur,
                     'ratinghome' => $rating,
@@ -345,14 +349,14 @@ class Pelanggan extends REST_Controller
 
                 );
                 $this->response($message, 200);
-            } else {
-                $message = array(
-                    'code' => '201',
-                    'message' => 'failed',
-                    'data' => []
-                );
-                $this->response($message, 201);
-            }
+            // } else {
+            //     $message = array(
+            //         'code' => '201',
+            //         'message' => 'failed',
+            //         'data' => []
+            //     );
+            //     $this->response($message, 201);
+            // }
         }
     }
 
@@ -368,7 +372,8 @@ class Pelanggan extends REST_Controller
         $kategori = $dec_data->kategori;
         $long = $dec_data->longitude;
         $lat = $dec_data->latitude;
-        $merchantbykategori = $this->Pelanggan_model->merchantbykategori($kategori, $long, $lat)->result();
+        $merchantbykategori = $this->Pelanggan_model->merchantbykategori($kategori, $long, $lat);
+        
         $condition = array(
             'no_telepon' => $dec_data->no_telepon,
             'status' => '1'
@@ -474,6 +479,43 @@ class Pelanggan extends REST_Controller
             $this->response($message, 201);
         }
     }
+ public function allmerchant_all()
+    {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            header("WWW-Authenticate: Basic realm=\"Private Area\"");
+            header("HTTP/1.0 401 Unauthorized");
+            return false;
+        }
+        $data = file_get_contents("php://input");
+        $dec_data = json_decode($data);
+        $long = $dec_data->longitude;
+        $lat = $dec_data->latitude;
+
+        $allmerchantnearby = $this->Pelanggan_model->allmerchant($long, $lat)->result();
+        $condition = array(
+            'no_telepon' => $dec_data->no_telepon,
+            'status' => '1'
+        );
+        $cek_login = $this->Pelanggan_model->get_data_pelanggan($condition);
+
+        if ($cek_login->num_rows() > 0) {
+            $message = array(
+                'code' => '200',
+                'message' => 'success',
+                'allmerchantnearby' => $allmerchantnearby
+
+
+            );
+            $this->response($message, 200);
+        } else {
+            $message = array(
+                'code' => '201',
+                'message' => 'failed',
+                'data' => []
+            );
+            $this->response($message, 201);
+        }
+    }
 
     public function allmerchantbykategori_post()
     {
@@ -491,7 +533,7 @@ class Pelanggan extends REST_Controller
         $long = $dec_data->longitude;
         $lat = $dec_data->latitude;
         $kategori = $dec_data->kategori;
-        $allmerchantnearbybykategori = $this->Pelanggan_model->allmerchantnearbybykategori($long, $lat, $fitur, $kategori)->result();
+        $allmerchantnearbybykategori = $this->Pelanggan_model->allmerchantnearbybykategori($long, $lat, $fitur, $kategori);
         $condition = array(
             'no_telepon' => $dec_data->no_telepon,
             'status' => '1'
@@ -573,58 +615,66 @@ class Pelanggan extends REST_Controller
         $long = $dec_data->longitude;
         $lat = $dec_data->latitude;
 
-        $merchantbyid = $this->Pelanggan_model->merchantbyid($idmerchant, $long, $lat)->row();
-        $itemstatus = $this->Pelanggan_model->itemstatus($idmerchant)->row();
-        if (empty($itemstatus->status_promo)) {
-            $itempromo = '0';
-        } else {
-            $itempromo = $itemstatus->status_promo;
-        }
-
-
-        $itembyid = $this->Pelanggan_model->itembyid($idmerchant)->Result();
-        $kategoriitem = $this->Pelanggan_model->kategoriitem($idmerchant)->Result();
-
-        $condition = array(
-            'no_telepon' => $dec_data->no_telepon,
-            'status' => '1'
-        );
-        $cek_login = $this->Pelanggan_model->get_data_pelanggan($condition);
-
-        if ($cek_login->num_rows() > 0) {
-
-            $message = array(
-                'code'              => '200',
-                'message'           => 'success',
-                'idfitur'           => $merchantbyid->id_fitur,
-                'idmerchant'        => $merchantbyid->id_merchant,
-                'namamerchant'      => $merchantbyid->nama_merchant,
-                'alamatmerchant'    => $merchantbyid->alamat_merchant,
-                'latmerchant'       => $merchantbyid->latitude_merchant,
-                'longmerchant'      => $merchantbyid->longitude_merchant,
-                'bukamerchant'      => $merchantbyid->jam_buka,
-                'tutupmerchant'     => $merchantbyid->jam_tutup,
-                'descmerchant'      => $merchantbyid->deskripsi_merchant,
-                'fotomerchant'      => $merchantbyid->foto_merchant,
-                'telpcmerchant'     => $merchantbyid->telepon_merchant,
-                'distance'          => $merchantbyid->distance,
-                'partner'           => $merchantbyid->partner,
-                'kategori'          => $merchantbyid->nama_kategori,
-                'promo'             => $itempromo,
-                'itembyid'          => $itembyid,
-                'kategoriitem'      => $kategoriitem
-
-
-            );
-            $this->response($message, 200);
-        } else {
-            $message = array(
-                'code' => '201',
-                'message' => 'failed',
-                'data' => []
+        $merchantbyid = $this->Pelanggan_model->merchantbyid($idmerchant, $long, $lat);
+       // print_r($merchantbyid);
+        $message = array(
+                'code' => '200',
+                'message' => 'success',
+                'data' => $merchantbyid
             );
             $this->response($message, 201);
-        }
+        exit;
+        // $itemstatus = $this->Pelanggan_model->itemstatus($idmerchant)->row();
+        // if (empty($itemstatus->status_promo)) {
+        //     $itempromo = '0';
+        // } else {
+        //     $itempromo = $itemstatus->status_promo;
+        // }
+
+
+        // $itembyid = $this->Pelanggan_model->itembyid($idmerchant)->Result();
+        // $kategoriitem = $this->Pelanggan_model->kategoriitem($idmerchant)->Result();
+
+        // $condition = array(
+        //     'no_telepon' => $dec_data->no_telepon,
+        //     'status' => '1'
+        // );
+        // $cek_login = $this->Pelanggan_model->get_data_pelanggan($condition);
+
+        // if ($cek_login->num_rows() > 0) {
+
+        //     $message = array(
+        //         'code'              => '200',
+        //         'message'           => 'success',
+        //         'idfitur'           => $merchantbyid->id_fitur,
+        //         'idmerchant'        => $merchantbyid->id_merchant,
+        //         'namamerchant'      => $merchantbyid->nama_merchant,
+        //         'alamatmerchant'    => $merchantbyid->alamat_merchant,
+        //         'latmerchant'       => $merchantbyid->latitude_merchant,
+        //         'longmerchant'      => $merchantbyid->longitude_merchant,
+        //         'bukamerchant'      => $merchantbyid->jam_buka,
+        //         'tutupmerchant'     => $merchantbyid->jam_tutup,
+        //         'descmerchant'      => $merchantbyid->deskripsi_merchant,
+        //         'fotomerchant'      => $merchantbyid->foto_merchant,
+        //         'telpcmerchant'     => $merchantbyid->telepon_merchant,
+        //         'distance'          => $merchantbyid->distance,
+        //         'partner'           => $merchantbyid->partner,
+        //         'kategori'          => $merchantbyid->nama_kategori,
+        //         'promo'             => $itempromo,
+        //         'itembyid'          => $itembyid,
+        //         'kategoriitem'      => $kategoriitem
+
+
+        //     );
+        //     $this->response($message, 200);
+        // } else {
+        //     $message = array(
+        //         'code' => '201',
+        //         'message' => 'failed',
+        //         'data' => []
+        //     );
+        //     $this->response($message, 201);
+        // }
     }
 
     public function itembykategori_post()
@@ -1412,6 +1462,172 @@ class Pelanggan extends REST_Controller
         }
     }
 
+function request_cityhub_post()
+    {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            header("WWW-Authenticate: Basic realm=\"Private Area\"");
+            header("HTTP/1.0 401 Unauthorized");
+            return false;
+        } else {
+            $cek = $this->Pelanggan_model->check_banned_user($_SERVER['PHP_AUTH_USER']);
+            if ($cek) {
+                $message = array(
+                    'message' => 'fail',
+                    'data' => 'Status User Banned'
+                );
+                $this->response($message, 200);
+            }
+        }
+
+        $data = file_get_contents("php://input");
+        $dec_data = json_decode($data);
+
+        $data_req = array(
+            'id_pelanggan' => $dec_data->id_pelanggan,
+            'order_fitur' => $dec_data->order_fitur,
+            'start_latitude' => $dec_data->start_latitude,
+            'start_longitude' => $dec_data->start_longitude,
+            'end_latitude' => $dec_data->end_latitude,
+            'end_longitude' => $dec_data->end_longitude,
+            'jarak' => $dec_data->jarak,
+            'harga' => $dec_data->harga,
+            'estimasi_time' => $dec_data->estimasi,
+            'waktu_order' => date('Y-m-d H:i:s'),
+            'alamat_asal' => $dec_data->alamat_asal,
+            'alamat_tujuan' => $dec_data->alamat_tujuan,
+            'biaya_akhir' => $dec_data->harga,
+            'kredit_promo' => $dec_data->kredit_promo,
+            'pakai_wallet' => $dec_data->pakai_wallet,
+            'courier_type' => $dec_data->courier_type,
+            'is_frangile' => $dec_data->is_frangile,
+            'height' => $dec_data->height,
+            'width' => $dec_data->width,
+             'item_image' => $dec_data->item_image,
+            'length' => $dec_data->length,
+            'courier_info' => $dec_data->courier_info
+        );
+
+
+        $dataDetail = array(
+            'nama_pengirim' => $dec_data->nama_pengirim,
+            'telepon_pengirim' => $dec_data->telepon_pengirim,
+            'nama_penerima' => $dec_data->nama_penerima,
+            'telepon_penerima' => $dec_data->telepon_penerima,
+            'nama_barang' => $dec_data->nama_barang
+        );
+
+        $request = $this->Pelanggan_model->insert_cityhub_send($data_req, $dataDetail);
+      
+        if ($request['status']) {
+            $message = array(
+                'message' => 'success',
+                'data' => $request['data']->result()
+            );
+            $this->response($message, 200);
+        } else {
+            $message = array(
+                'message' => 'fail',
+                'data' => []
+            );
+            $this->response($message, 200);
+        }
+    }
+
+
+
+ function request_cityhub_old_post()
+    {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            header("WWW-Authenticate: Basic realm=\"Private Area\"");
+            header("HTTP/1.0 401 Unauthorized");
+            return false;
+        } else {
+            $cek = $this->Pelanggan_model->check_banned_user($_SERVER['PHP_AUTH_USER']);
+            if ($cek) {
+                $message = array(
+                    'message' => 'fail',
+                    'data' => 'Status User Banned'
+                );
+                $this->response($message, 200);
+            }
+        }
+
+        $data = file_get_contents("php://input");
+        $dec_data = json_decode($data);
+
+        $data_req = array(
+            'id_pelanggan' => $dec_data->id_pelanggan,
+            'order_fitur' => $dec_data->order_fitur,
+             'nama_barang' => $dec_data->nama_barang,
+            'start_latitude' => $dec_data->start_latitude,
+            'start_longitude' => $dec_data->start_longitude,
+            'end_latitude' => $dec_data->end_latitude,
+            'end_longitude' => $dec_data->end_longitude,
+            'jarak' => $dec_data->jarak,
+            'harga' => $dec_data->harga,
+            'estimasi_time' => $dec_data->estimasi,
+            'waktu_order' => date('Y-m-d H:i:s'),
+            'alamat_asal' => $dec_data->alamat_asal,
+            'alamat_tujuan' => $dec_data->alamat_tujuan,
+            'biaya_akhir' => $dec_data->harga,
+            'kredit_promo' => $dec_data->kredit_promo,
+            'pakai_wallet' => $dec_data->pakai_wallet,
+             'courier_type' => $dec_data->courier_type,
+            'is_frangile' => $dec_data->is_frangile,
+            'height' => $dec_data->height,
+            'width' => $dec_data->width,
+             'item_image' => $dec_data->item_image,
+            'length' => $dec_data->length,
+            'courier_info' => $dec_data->courier_info
+        );
+   
+        $dataDetail = array(
+            'nama_pengirim' => $dec_data->nama_penerima,
+            'telepon_pengirim' =>$dec_data->telepon_pengirim,
+            'nama_pengirim' => $dec_data->nama_pengirim,
+            'telepon_penerima' => $dec_data->telepon_penerima,
+            'nama_barang' => $dec_data->nama_barang
+        );
+        
+
+        $request = $this->Pelanggan_model->insert_cityhub_send($data_req,$dataDetail);
+print_r($request['status']);exit;
+        if ($request['status']) {
+            $message = array(
+                'message' => 'success',
+                'data' => $request['data']->result()
+            );
+            $this->response($message, 200);
+        } else {
+            $message = array(
+                'message' => 'fail',
+                'data' => []
+            );
+            $this->response($message, 200);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     function changepass_post()
     {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
@@ -1664,7 +1880,7 @@ class Pelanggan extends REST_Controller
             
         );
       
-        $result = $this->Pelanggan_model->update_user_address($user_address,$dec_data->user_id);
+        $result = $this->Pelanggan_model->update_user_address($user_address,$dec_data->user_id,$dec_data->id);
 
         if ($result['status'] == true) {
 
@@ -1708,7 +1924,7 @@ class Pelanggan extends REST_Controller
         $dec_data = json_decode($data);
        
       
-        $result = $this->Pelanggan_model->delete_user_address($dec_data->user_id);
+        $result = $this->Pelanggan_model->delete_user_address($dec_data->id);
 
         if ($result['status'] == true) {
 
@@ -1760,7 +1976,7 @@ class Pelanggan extends REST_Controller
                 $message = array(
                     'status' => true,
                     'message' => 'success',
-                    'data' => $result,
+                    'data' => $result['data'],
 
 
                 );

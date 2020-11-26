@@ -172,6 +172,16 @@ class Pelanggan_model extends CI_model
         $this->db->where('tanggal_berakhir>', date("Y-m-d"));
         return $this->db->get()->result_array();
     }
+     public function sliderhome2()
+    {
+        $this->db->select('*');
+        $this->db->from('promosi2');
+        $this->db->join('fitur', 'promosi2.fitur_promosi = fitur.id_fitur', 'left');
+        $this->db->where('is_show', '1');
+        $this->db->where('tanggal_berakhir>', date("Y-m-d"));
+        return $this->db->get()->result_array();
+    }
+
 
     public function fiturhome()
     {
@@ -347,9 +357,16 @@ class Pelanggan_model extends CI_model
                 'icon' => $row['icon'],
                 'home' => $row['home'],
                 'maks_distance' => $row['maks_distance'],
+                'wallet_minimum' => $row['wallet_minimum'],
+                 'komisi' => $row['komisi'],
                 'icon_driver' => $row['icon_driver'],
+                'driver_job' => $row['driver_job'],
                 'biaya_minimum' => $row['biaya_minimum'],
+                'jarak_minimum' => $row['jarak_minimum'],
                 'keterangan_biaya' => $row['keterangan_biaya'],
+                   'basedistance' => $row['basedistance'],
+                      'serviceChargeType' => $row['serviceChargeType'],
+                         'servicecharge' => $row['servicecharge'],
                 'keterangan' => $row['keterangan'],
                 'diskon' => $row['nilai'] . "%",
                 'biaya_akhir' => $row['nilai'] / 100
@@ -432,7 +449,57 @@ class Pelanggan_model extends CI_model
             );
         }
     }
+    
+    
+    public function insert_cityhub_send($data_req,$dataDetail)
+    {
+        $ha = 0;
+        $kreditamuont = explode(".", $data_req['kredit_promo']);
+        $ha  = $data_req['harga'] - $kreditamuont[0];
+        if ($ha <= 0) {
+            $ha = 0;
+        }
+        $data_req['kredit_promo'] = $kreditamuont[0];
+        $data_req['biaya_akhir'] = $ha;
 
+        $ins_trans = $this->db->insert('transaksi', $data_req);
+        $reqid = $this->db->insert_id();
+        if ($this->db->affected_rows() == 1) {
+            $data_hist = array(
+                'id_transaksi' => $reqid,
+                'id_driver' => 'D0',
+                'status' => '1'
+            );
+            $this->db->insert('history_transaksi', $data_hist);
+            $dataDetail['id_transaksi'] = $reqid;
+            $this->db->insert('transaksi_detail_send', $dataDetail);
+            $get_data_msend = $this->get_data_transaksi_send($data_req);
+                           
+
+            return array(
+                'status' => true,
+                'data' => $get_data_msend
+            );
+        } else {
+            return array(
+                'status' => false,
+                'data' => []
+            );
+        }
+    }
+
+
+  function get_data_city_send($data_cond)
+    {
+        $this->db->select('*');
+        $this->db->from('transaksi');
+        $this->db->join('transaksi_detail_send', 'transaksi.id = transaksi_detail_send.id_transaksi', 'left');
+        $this->db->where($data_cond);
+        $cek = $this->db->get();
+    
+                return $cek; 
+
+    }
     function get_data_transaksi_send($data_cond)
     {
         $this->db->select('*');
@@ -747,6 +814,16 @@ class Pelanggan_model extends CI_model
 
     function rate_driver($data)
     {
+      // print_r($data);
+       
+   
+         $getdrivername=$this->db->query("select * from driver WHERE id='$data[id_driver]'");
+            $resultgetdrivername=$getdrivername->result();
+
+  $nameDriver= $resultgetdrivername[0]->nama_driver;
+  
+    // exit; 
+        
         $ins_rate = $this->db->insert('rating_driver', $data);
         if ($this->db->affected_rows() == 1) {
             $get_rating = $this->count_rate_driver($data['id_driver']);
@@ -756,9 +833,237 @@ class Pelanggan_model extends CI_model
 
             $this->db->where('id', $data['id_driver']);
             $upd_driver = $this->db->update('driver', array('rating' => $get_rating));
-            return true;
-        } else {
-            return false;
+            
+            $this->db->select('*');
+$this->db->from('app_settings');
+        $query=$this->db->query("select * from app_settings WHERE 1");
+            $datarating=$query->result();
+           
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          if($data['rating']==1)
+          {
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$data[id_driver]'");
+            $resultgetallmoney=$getallmoney->result();
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$aaaaaaaaaaaaaaaaaaaaa=$this->db->query($sql,array('$data[id_driver]','$datarating[0]->rating1'));
+        //   print_r($aaaaaaaaaaaaaaaaaaaaa);
+        //   exit;
+          }
+          else
+          { 
+              
+              
+               $allmoney=$datarating[0]->rating1+$resultgetallmoney[0]->saldo;
+               
+               
+               $dataForwallet = [
+        'id_user'=>$data['id_driver'],
+        'jumlah'=>$datarating[0]->rating1,
+        'bank'=>'Byadmin',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $data['id_driver']);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+          
+        }
+        elseif($data['rating']==2.0)
+          {
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$data[id_driver]'");
+            $resultgetallmoney=$getallmoney->result();
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$this->db->query($sql,array('$data[id_driver]','$datarating[0]->rating2'));
+          
+          }
+          else
+          {
+             
+              
+                $allmoney=$datarating[0]->rating2+$resultgetallmoney[0]->saldo;
+                
+               $dataForwallet = [
+        'id_user'=>$data['id_driver'],
+        'jumlah'=>$datarating[0]->rating2,
+        'bank'=>'Byadmin',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $data['id_driver']);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+          
+        }
+        elseif($data['rating']==3)
+          {
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$data[id_driver]'");
+               
+              
+            
+            $resultgetallmoney=$getallmoney->result();
+            if(empty($resultgetallmoney))
+          {
+              
+              $sql = "insert saldo (id_user,saldo) values (?,?)";
+$this->db->query($sql,array('$data[id_driver]','$datarating[0]->rating3'));
+             
+            
+            
+          
+          }
+          else
+          {
+              
+                  $allmoney=$datarating[0]->rating3+$resultgetallmoney[0]->saldo;
+                  //exit;
+               $dataForwallet = [
+        'id_user'=>$data['id_driver'],
+        'jumlah'=>$datarating[0]->rating3,
+        'bank'=>'Byadmin',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $data['id_driver']);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+          
+        } 
+        elseif($data['rating']==4)
+          {
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$data[id_driver]'");
+            $resultgetallmoney=$getallmoney->result();
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$this->db->query($sql,array('$data[id_driver]','$datarating[0]->rating4'));
+          
+          }
+          else
+          {
+              
+            $allmoney=$datarating[0]->rating4+$resultgetallmoney[0]->saldo;
+             
+               $dataForwallet = [
+        'id_user'=>$data['id_driver'],
+        'jumlah'=>$datarating[0]->rating4,
+        'bank'=>'Byadmin',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $data['id_driver']);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+          
+        } 
+        elseif($data['rating']==5)
+          {
+               $getallmoney=$this->db->query("select * from saldo WHERE id_user='$data[id_driver]'");
+            $resultgetallmoney=$getallmoney->result();
+            if(empty($resultgetallmoney))
+          {
+             $sql = "insert saldo (id_user,saldo) values (?,?)";
+$this->db->query($sql,array('$data[id_driver]','$datarating[0]->rating5'));
+          
+          }
+          else
+          {
+      $allmoney=$datarating[0]->rating5+$resultgetallmoney[0]->saldo;
+                 
+               $dataForwallet = [
+        'id_user'=>$data['id_driver'],
+        'jumlah'=>$datarating[0]->rating5,
+        'bank'=>'Byadmin',
+        'nama_pemilik'=>$nameDriver,
+        'rekening'=>'wallet',
+       
+        'type'=>'Commission',
+        'status'=>'1'
+        
+       ];
+            
+              // exit;
+               $this->db->where('id_user', $data['id_driver']);
+            $upd_driver = $this->db->update('saldo', array('saldo' =>$allmoney));
+           
+          
+         
+
+  $this->db->insert('wallet', $dataForwallet);
+
+
+return true;
+          }
+          
+        } 
         }
     }
 
@@ -1358,31 +1663,128 @@ class Pelanggan_model extends CI_model
 
     public function merchantbykategori($kategori, $long, $lat)
     {
-        $this->db->select("merchant.id_merchant , merchant.nama_merchant , merchant.alamat_merchant , merchant.latitude_merchant , merchant.longitude_merchant , merchant.jam_buka , merchant.jam_tutup ,
-            merchant.deskripsi_merchant , merchant.category_merchant , merchant.foto_merchant , merchant.telepon_merchant , merchant.status_merchant , merchant.open_merchant,saldo.saldo,
-            (6371 * acos(cos(radians($lat)) * cos(radians(merchant.latitude_merchant)) * cos(radians(merchant.longitude_merchant) - radians( $long)) + sin(radians($lat)) * sin( radians(merchant.latitude_merchant)))) AS distance
-            ,(SELECT item.status_promo FROM item where merchant.id_merchant = item.id_merchant AND status_item = 1 ORDER BY status_promo DESC LIMIT 1) AS status_promo, fitur.jarak_minimum, fitur.wallet_minimum");
-        $this->db->select('category_merchant.nama_kategori');
+        
+        $final_data = array();
+        // $this->db->select("merchant.id_merchant , merchant.nama_merchant , merchant.alamat_merchant , merchant.latitude_merchant , merchant.longitude_merchant , merchant.jam_buka , merchant.jam_tutup ,
+        //     merchant.deskripsi_merchant , merchant.foto_merchant , merchant.telepon_merchant , merchant.status_merchant , merchant.open_merchant,saldo.saldo,
+        //     (6371 * acos(cos(radians($lat)) * cos(radians(merchant.latitude_merchant)) * cos(radians(merchant.longitude_merchant) - radians( $long)) + sin(radians($lat)) * sin( radians(merchant.latitude_merchant)))) AS distance
+        //     ,(SELECT item.status_promo FROM item where merchant.id_merchant = item.id_merchant AND status_item = 1 ORDER BY status_promo DESC LIMIT 1) AS status_promo, fitur.jarak_minimum, fitur.wallet_minimum");
+        // $this->db->select('category_merchant.nama_kategori');
 
 
-        $this->db->where('merchant.status_merchant = 1');
-        $this->db->where('mitra.status_mitra = 1');
-        $this->db->where('saldo.saldo >= fitur.wallet_minimum');
-        if ($kategori != '1') {
-            $this->db->where("merchant.category_merchant = $kategori");
+        // $this->db->where('merchant.status_merchant = 1');
+        // $this->db->where('mitra.status_mitra = 1');
+        // $this->db->where('saldo.saldo >= fitur.wallet_minimum');
+        // if ($kategori != '1') {
+        //     $this->db->where("merchant.category_merchant = $kategori");
+        // }
+
+        // $this->db->having("status_promo is not null");
+        // $this->db->having("distance <= fitur.jarak_minimum");
+        // $this->db->order_by('distance ASC');
+
+        // $this->db->join('fitur', 'merchant.id_fitur = fitur.id_fitur');
+        // $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
+        // $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
+        // $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
+        if($kategori==1)
+        {
+   $query = $this->db->query("SELECT `id_merchant` FROM `merchant`");
+$rowDataJ=$query->result_array();
+$row = $query->result();
+
+
         }
+        
+        else
+        {
+        $query = $this->db->query("SELECT `merch_id` FROM `cat_mitra` WHERE `cat_id`= $kategori");
+$rowDataJ=$query->result_array();
+$row = $query->result();
 
-        $this->db->having("status_promo is not null");
-        $this->db->having("distance <= fitur.jarak_minimum");
-        $this->db->order_by('distance ASC');
+}
 
-        $this->db->join('fitur', 'merchant.id_fitur = fitur.id_fitur');
-        $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
-        $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
-        $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
+foreach($rowDataJ as $s)
+{
+  
+  
+ if(!empty($s['merch_id']))
+ {
+     $meRchId=$s['merch_id'];
+ }
+ else
+ {
+     $meRchId=$s['id_merchant'];
+ }
+   
+        $query1 = $this->db->query("SELECT * FROM `merchant` WHERE `id_merchant`=$meRchId ");
+        $row1 = $query1->result_array();
+    // print_r($row1);
+    
+      foreach($row1 as $row11)
+      {
+      //Distance Calc 
+        $lat1=$lat;
+        $lat2=$row11['latitude_merchant'];
+        $lon1=$long;
+        $lon2=$row11['longitude_merchant'];
+        $unit='K';
+           
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        $unit = strtoupper($unit);
+      
+      $datafitur = $this->db->query("SELECT * FROM `fitur` WHERE `id_fitur`= $row11[id_fitur]");
+      
+        $resultfitur = $datafitur->result_array();
+    foreach ($resultfitur as $result)
+    
+    {
 
-        $this->db->limit('4');
-        return $this->db->get('merchant');
+        if(round($miles * 1.609344)<=$result['maks_distance'])
+        {
+        
+          $row11["distance"]=round($miles * 1.609344);
+           
+          $dataitem = $this->db->query("SELECT * FROM `item` WHERE `id_merchant`= $row11[id_merchant] AND `status_promo`=1");
+      
+        $resultdataitem = $dataitem->result_array();
+        if(!empty($resultdataitem))
+        {
+              $row11["status_promo"]=1;
+            
+        }
+        else
+        {
+              $row11["status_promo"]=0;
+            
+        }
+      
+          
+          array_push($final_data, $row11);
+          
+        }
+        
+    }
+     
+  
+      }
+       
+      
+        
+        
+}
+
+return $final_data;
+      exit;
+ // exit;
+
+    //exit;
+      
+   
     }
 
     public function merchantbykategoripromo($kategori, $long, $lat)
@@ -1443,32 +1845,126 @@ class Pelanggan_model extends CI_model
 
     public function allmerchantnearbybykategori($long, $lat, $fitur, $kategori)
     {
-        $this->db->select("merchant.id_merchant , merchant.nama_merchant , merchant.alamat_merchant , merchant.latitude_merchant , merchant.longitude_merchant , merchant.jam_buka , merchant.jam_tutup ,
-            merchant.deskripsi_merchant , merchant.category_merchant , merchant.foto_merchant , merchant.telepon_merchant , merchant.status_merchant , merchant.open_merchant,saldo.saldo,
-            (6371 * acos(cos(radians($lat)) * cos(radians(merchant.latitude_merchant)) * cos(radians(merchant.longitude_merchant) - radians( $long)) + sin(radians($lat)) * sin( radians(merchant.latitude_merchant)))) AS distance
-            ,(SELECT item.status_promo FROM item where merchant.id_merchant = item.id_merchant AND status_item = 1 ORDER BY status_promo DESC LIMIT 1) AS status_promo, fitur.jarak_minimum, fitur.wallet_minimum");
-        $this->db->select('category_merchant.nama_kategori');
+       
+        $final_data = array();
+        // $this->db->select("merchant.id_merchant , merchant.nama_merchant , merchant.alamat_merchant , merchant.latitude_merchant , merchant.longitude_merchant , merchant.jam_buka , merchant.jam_tutup ,
+        //     merchant.deskripsi_merchant , merchant.foto_merchant , merchant.telepon_merchant , merchant.status_merchant , merchant.open_merchant,saldo.saldo,
+        //     (6371 * acos(cos(radians($lat)) * cos(radians(merchant.latitude_merchant)) * cos(radians(merchant.longitude_merchant) - radians( $long)) + sin(radians($lat)) * sin( radians(merchant.latitude_merchant)))) AS distance
+        //     ,(SELECT item.status_promo FROM item where merchant.id_merchant = item.id_merchant AND status_item = 1 ORDER BY status_promo DESC LIMIT 1) AS status_promo, fitur.jarak_minimum, fitur.wallet_minimum");
+        // $this->db->select('category_merchant.nama_kategori');
 
 
-        $this->db->where('merchant.status_merchant = 1');
-        $this->db->where('mitra.status_mitra = 1');
-        $this->db->where("merchant.id_fitur = $fitur");
+        // $this->db->where('merchant.status_merchant = 1');
+        // $this->db->where('mitra.status_mitra = 1');
+        // $this->db->where('saldo.saldo >= fitur.wallet_minimum');
+        // if ($kategori != '1') {
+        //     $this->db->where("merchant.category_merchant = $kategori");
+        // }
 
-        $this->db->where('saldo.saldo >= fitur.wallet_minimum');
-        if ($kategori != '1') {
-            $this->db->where("merchant.category_merchant = $kategori");
+        // $this->db->having("status_promo is not null");
+        // $this->db->having("distance <= fitur.jarak_minimum");
+        // $this->db->order_by('distance ASC');
+
+        // $this->db->join('fitur', 'merchant.id_fitur = fitur.id_fitur');
+        // $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
+        // $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
+        // $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
+        if($kategori==1)
+        {
+   $query = $this->db->query("SELECT `id_merchant` FROM `merchant`");
+$rowDataJ=$query->result_array();
+$row = $query->result();
+
+
         }
+        
+        else
+        {
+        $query = $this->db->query("SELECT `merch_id` FROM `cat_mitra` WHERE `cat_id`= $kategori");
+$rowDataJ=$query->result_array();
+$row = $query->result();
 
-        $this->db->having("status_promo is not null");
-        $this->db->having("distance <= fitur.jarak_minimum");
-        $this->db->order_by('distance ASC');
-        $this->db->join('fitur', 'merchant.id_fitur = fitur.id_fitur', 'left');
-        $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
-        $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
-        $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
+}
 
+foreach($rowDataJ as $s)
+{
+  
+  
+ if(!empty($s['merch_id']))
+ {
+     $meRchId=$s['merch_id'];
+ }
+ else
+ {
+     $meRchId=$s['id_merchant'];
+ }
+   
+        $query1 = $this->db->query("SELECT * FROM `merchant` WHERE `id_merchant`=$meRchId ");
+        $row1 = $query1->result_array();
+    // print_r($row1);
+    
+      foreach($row1 as $row11)
+      {
+      //Distance Calc 
+        $lat1=$lat;
+        $lat2=$row11['latitude_merchant'];
+        $lon1=$long;
+        $lon2=$row11['longitude_merchant'];
+        $unit='K';
+           
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        $unit = strtoupper($unit);
+      
+      $datafitur = $this->db->query("SELECT * FROM `fitur` WHERE `id_fitur`= $row11[id_fitur]");
+      
+        $resultfitur = $datafitur->result_array();
+    foreach ($resultfitur as $result)
+    
+    {
 
-        return $this->db->get('merchant');
+        if(round($miles * 1.609344)<=$result['maks_distance'])
+        {
+        
+          $row11["distance"]=round($miles * 1.609344);
+           
+          $dataitem = $this->db->query("SELECT * FROM `item` WHERE `id_merchant`= $row11[id_merchant] AND `status_promo`=1");
+      
+        $resultdataitem = $dataitem->result_array();
+        if(!empty($resultdataitem))
+        {
+              $row11["status_promo"]=1;
+            
+        }
+        else
+        {
+              $row11["status_promo"]=0;
+            
+        }
+      
+          
+          array_push($final_data, $row11);
+          
+        }
+        
+    }
+     
+  
+      }
+       
+      
+        
+        
+}
+
+return $final_data;
+      exit;
+ // exit;
+
+    //exit;
     }
 
 
@@ -1506,10 +2002,14 @@ class Pelanggan_model extends CI_model
         $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
         $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
         $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
-
-        $this->db->where("
-        saldo.saldo >= fitur.wallet_minimum AND merchant.id_fitur = $fitur
-        ");
+        if(is_null($fitur) or $fitur === '' or $fitur === 'null' or $fitur === '-1'){
+            $this->db->where("
+        saldo.saldo >= fitur.wallet_minimum"); 
+        }else{
+            $this->db->where("
+            saldo.saldo >= fitur.wallet_minimum AND merchant.id_fitur = $fitur
+            ");
+        }
         $this->db->where('mitra.status_mitra = 1');
         $this->db->where('merchant.status_merchant = 1');
 
@@ -1562,51 +2062,82 @@ class Pelanggan_model extends CI_model
     public function merchantbyid($idmerchant, $long, $lat)
     {
 
-        $this->db->select("
-            merchant.id_merchant , 
-            merchant.id_fitur ,
-            merchant.nama_merchant , 
-            merchant.alamat_merchant , merchant.latitude_merchant , 
-            merchant.longitude_merchant , merchant.jam_buka , merchant.jam_tutup ,
-            merchant.deskripsi_merchant , 
-            merchant.category_merchant , 
-            merchant.foto_merchant , 
-            merchant.telepon_merchant , 
-            merchant.status_merchant , 
-            merchant.open_merchant,
-            (6371 * acos(cos(radians($lat)) * 
-            cos(radians(merchant.latitude_merchant)) * 
-            cos(radians(merchant.longitude_merchant) - 
-            radians( $long)) + 
-            sin(radians($lat)) * 
-            sin( radians(merchant.latitude_merchant)))) AS distance
-        ");
-        $this->db->select('
-            item.status_promo,
-            item.nama_item,
-            item.harga_item,
-            item.harga_promo,
-            item.kategori_item,
-            item.deskripsi_item');
+
+       
+       
+        $final_data = array();
+       
+ 
+  
+ 
+   
+        $query1 = $this->db->query("SELECT * FROM `merchant` WHERE `id_merchant`=$idmerchant ");
+        $row1 = $query1->result_array();
+    // print_r($row1);
+    
+      foreach($row1 as $row11)
+      {
+      //Distance Calc 
+        $lat1=$lat;
+        $lat2=$row11['latitude_merchant'];
+        $lon1=$long;
+        $lon2=$row11['longitude_merchant'];
+        $unit='K';
+           
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        $unit = strtoupper($unit);
+      
+      $datafitur = $this->db->query("SELECT * FROM `fitur` WHERE `id_fitur`= $row11[id_fitur]");
+      
+        $resultfitur = $datafitur->result_array();
+    foreach ($resultfitur as $result)
+    
+    {
+
+        if(round($miles * 1.609344)<=$result['maks_distance'])
+        {
+        
+          $row11["distance"]=round($miles * 1.609344);
+           
+          $dataitem = $this->db->query("SELECT * FROM `item` WHERE `id_merchant`= $row11[id_merchant]");
+      
+        $resultdataitem = $dataitem->result_array();
+          $row11['itembyid']=$resultdataitem;
+          
+            
+          $dataitemresultdataitem = $this->db->query("SELECT * FROM `category_item` WHERE `id_merchant`= $row11[id_merchant]");
+      $resultdataitemdataitemresultdataitem = $dataitemresultdataitem->result_array();
+      $row11['kategoriitem']=$resultdataitemdataitemresultdataitem;
+        //     foreach($resultdataitem as $resultdataItemall)
+        //     {
+        // // {array_push($row11, $resultdataItemall);
+        //       $row11[]=$resultdataItemall;
+        // }
+          
+          array_push($final_data, $row11);
+          
+        }
+        
+    }
+   return $final_data;
+    //  exit;
+  
+      }
+       
+      
+        
+        
 
 
-        $this->db->select('mitra.partner');
-        $this->db->select('category_merchant.nama_kategori');
-        $this->db->select('fitur.fitur, fitur.jarak_minimum, fitur.wallet_minimum');
-        $this->db->select('saldo.saldo');
-        $this->db->where("merchant.id_merchant = $idmerchant");
-        $this->db->where('merchant.status_merchant = 1');
-        $this->db->where('saldo.saldo >= fitur.wallet_minimum');
+return $final_data;
+      exit;
+ // exit;
 
-        $this->db->join('fitur', 'merchant.id_fitur = fitur.id_fitur', 'left');
-        $this->db->join('mitra', 'mitra.id_merchant = merchant.id_merchant', 'left');
-        $this->db->join('saldo', 'mitra.id_mitra = saldo.id_user', 'left');
-        $this->db->join('category_merchant', 'merchant.category_merchant = category_merchant.id_kategori_merchant', 'left');
-        $this->db->join('item', 'merchant.id_merchant = item.id_merchant', 'left');
-
-        $this->db->order_by('merchant.id_merchant');
-
-        return $this->db->get('merchant');
+    //exit;
     }
 
     public function itemstatus($idmerchant)
@@ -1779,9 +2310,10 @@ class Pelanggan_model extends CI_model
 
     }
     
-    public function update_user_address($user_address,$user_id){
+    public function update_user_address($user_address,$user_id,$address_id){
         
          $this->db->where('user_id', $user_id);
+         $this->db->where('id', $address_id);
         $this->db->update('user_address', $user_address);
         if ($this->db->affected_rows() == 1) {
             return array(
@@ -1798,14 +2330,13 @@ class Pelanggan_model extends CI_model
     }
     
     
-    public function delete_user_address($user_id){
+    public function delete_user_address($address_id){
         
-         $this->db->where('user_id', $user_id);
+         $this->db->where('id', $address_id);
         $this->db->delete('user_address');
         if ($this->db->affected_rows() == 1) {
             return array(
                 'status'        => true,
-
             );
         } else {
             return array(
@@ -1818,16 +2349,17 @@ class Pelanggan_model extends CI_model
     
     public function get_user_address($user_id){
         
-        $id = $this -> db -> select('*') -> where('user_id', $user_id)
-        -> limit(1)
-        -> get('user_address')
-        -> row();
+        // $id = $this -> db -> select('*') -> where('user_id', $user_id)
+        $id = $this->db->query("SELECT * FROM user_address WHERE `user_id` = '$user_id';");
+        // -> get('user_address')
+        // -> rows();
         // echo json_encode(['data' => $id]);exit;
+        
 
         if (!is_null($id)) {
             return array(
                 'status' => true,
-                'data'   => $id
+                'data'   => $id->result()
 
             );
         } else {

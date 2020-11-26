@@ -175,6 +175,49 @@
 
                             </a>
                         </li>
+                       
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="collapse" href="#cate" aria-expanded="false" aria-controls="cate">
+                                   <i class="fa fa-tasks" aria-hidden="true"></i>
+&nbsp;
+                                <span class="menu-title text-dark">Catelog Management</span>
+                                <span class="badge badge-white"><i class="mdi mdi-menu-down mdi-24px text-primary"></i></span>
+                            </a>
+                            <div class="collapse" id="cate">
+                                <ul class="nav flex-column sub-menu">
+                                    <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>product_category/add">Add Category</a>
+                                    </li> <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>product_category">Categories</a></li>
+                                  
+                                </ul>
+                            </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="collapse" href="#product" aria-expanded="false" aria-controls="product">
+                                   <i class="fa fa-tasks" aria-hidden="true"></i>
+&nbsp;
+                                <span class="menu-title text-dark">Product Management</span>
+                                <span class="badge badge-white"><i class="mdi mdi-menu-down mdi-24px text-primary"></i></span>
+                            </a>
+                            <div class="collapse" id="product">
+                                <ul class="nav flex-column sub-menu">
+                                    <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>product/add">Add Product</a>
+                                    </li> <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>product">Products</a></li>
+                                  
+                                </ul>
+                            </div>
+                        </li>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                         
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
@@ -248,12 +291,29 @@
                                 <span class="menu-title text-dark">Promo Code management</span>
                             </a>
                         </li>
+<!--                        <li class="nav-item">-->
+<!--                            <a class="nav-link" href="<?= base_url(); ?>promoslider">-->
+<!--                               <i class="fa fa-sliders" aria-hidden="true"></i>-->
+<!--&nbsp;-->
+<!--                                <span class="menu-title text-dark"> Slider management</span>-->
+<!--                            </a>-->
+<!--                        </li>-->
+                        
+                        
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url(); ?>promoslider">
-                               <i class="fa fa-sliders" aria-hidden="true"></i>
+                            <a class="nav-link" data-toggle="collapse" href="#slider" aria-expanded="false" aria-controls="tables">
+                                <i class="fa fa-sliders" aria-hidden="true"></i>
 &nbsp;
-                                <span class="menu-title text-dark"> Slider management</span>
+                                <span class="menu-title text-dark">Slider management</span>
+                                <span class="badge badge-white"><i class="mdi mdi-menu-down mdi-24px text-primary"></i></span>
                             </a>
+                            <div class="collapse" id="slider">
+                                <ul class="nav flex-column sub-menu">
+                                    <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>promoslider">Primary Slider</a></li>
+                                    <li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>promoslider2">Secondary Slider</a></li>
+                                    <!--<li class="nav-item"> <a class="nav-link" href="<?= base_url(); ?>wallet/tambahwithdraw">Manual Withdraw</a></li>-->
+                                </ul>
+                            </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= base_url(); ?>news">
